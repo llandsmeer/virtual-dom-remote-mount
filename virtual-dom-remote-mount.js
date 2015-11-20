@@ -3,7 +3,6 @@ var diff = require('virtual-dom/diff');
 function Page() {
     this.state = {};
     this.init();
-    this.tree = null;
 }
 
 Page.prototype.render = function(state) {
@@ -34,6 +33,22 @@ Page.prototype.replaceState = function(nextState) {
 };
 
 Page.prototype.forceUpdate = function() {
+    this._nextTree(this.render(this.state));
+};
+
+Page.prototype._nextTree = function(nextTree) {
+    if (this._tree === undefined) {
+        this._sendTree(nextTree);
+    } else {
+        this._sendPatches(diff(this._tree, nextTree));
+    }
+    this._tree = nextTree;
+};
+
+Page.prototype._sendTree = function(tree) {
+};
+
+Page.prototype._sendPatches = function(patches) {
 };
 
 module.exports = Page;
