@@ -1,6 +1,6 @@
 var path = require('path');
 var express = require('express');
-var socketio = require('socketio');
+var socketio = require('socket.io');
 var browserify = require('browserify');
 
 var SCRIPT_NAME = 'client.js';
@@ -24,12 +24,12 @@ Mount.prototype.listen = function(port, cb) {
         console.log('listening on http://*:' + address.port + '/');
     });
     this.io = socketio.listen(server);
-    this.io.on('connection', this.handleSocketConnection.bind(this);
+    this.io.on('connection', this.handleSocketConnection.bind(this));
 }
 
 Mount.prototype.registerExpress = function() {
     this.app.get('/virtual-dom-server.js', this.sendJavascript.bind(this));
-    this.app.all('*', this.handleHttpConnection.bind(this));
+    this.app.use('/', this.handleHttpConnection.bind(this));
 };
 
 Mount.prototype.handleHttpConnection = function(req, res) {
@@ -37,6 +37,7 @@ Mount.prototype.handleHttpConnection = function(req, res) {
     res.set('Content-Type', 'text/html');
     connid = this.generateConnectionId();
     page = new this.Page();
+    res.send(pageToHtml(page));
 };
 
 Mount.prototype.handleSocketConnection = function(socket) {
@@ -87,7 +88,7 @@ function pageToHtml(page) {
         '<html>' +
             '<head>' +
                 '<script src="/socket.io/socket.io.js"></script>' +
-                (page.head || []).join('')
+                (page.head || []).join('') +
             '</head>' +
             '<body>' +
                 '<script src="virtual-dom-remote-mount.js"></script>' +
