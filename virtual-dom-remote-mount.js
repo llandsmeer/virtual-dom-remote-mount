@@ -12,18 +12,13 @@ Page.prototype.init = function(state) {
 };
 
 Page.prototype.setState = function(nextState) {
-    var key;
     if (typeof nextState === 'function') {
         nextState = nextState(this.state);
     }
     if (typeof nextState !== 'object') {
         throw 'nextState is not or does not return an object';
     }
-    for (key in nextState) {
-        if (nextState.hasOwnProperty(key)) {
-            this.state[key] = nextState[key];
-        }
-    }
+    copy(this.state, nextState);
     this.forceUpdate();
 };
 
@@ -46,9 +41,20 @@ Page.prototype._nextTree = function(nextTree) {
 };
 
 Page.prototype._sendTree = function(tree) {
+    this.ioSocket.emit('virtual-dom-remote-mount:tree', ioClone(tree));
 };
 
 Page.prototype._sendPatches = function(patches) {
+    this.ioSocket.emit('virtual-dom-remote-mount:patches', patches);
 };
 
 module.exports = Page;
+
+function copy(dst, src) {
+    var key;
+    for (key in src) {
+        if (dst.hasOwnProperty(key)) {
+            dst[key] = src[key];
+        }
+    }
+};
