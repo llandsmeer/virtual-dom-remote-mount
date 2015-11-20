@@ -1,0 +1,16 @@
+{
+  "name": "virtual-dom-remote-mount",
+  "version": "0.0.1",
+  "description": "Clientless virtual-dom",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lennart Landsmeer <lennart@landsmeer.email>",
+  "license": "MIT",
+  "dependencies": {
+    "vdom-thunk": "^3.0.0",
+    "vdom-to-html": "^2.2.0",
+    "virtual-dom": "^2.1.1"
+  }
+}
