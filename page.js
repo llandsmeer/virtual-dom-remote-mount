@@ -48,6 +48,9 @@ Page.prototype._sendPatches = function(patches) {
     this.ioSocket.emit('virtual-dom-remote-mount:patches', patches);
 };
 
+Page.prototype.initialHtml = function() {
+}
+
 module.exports = Page;
 
 function copy(dst, src) {
