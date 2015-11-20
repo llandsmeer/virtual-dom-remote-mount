@@ -1,4 +1,5 @@
 var diff = require('virtual-dom/diff');
+var vdomToHtml = require('vdom-to-html');
 
 function Page() {
     this.state = {};
@@ -27,8 +28,12 @@ Page.prototype.replaceState = function(nextState) {
     this.setState(nextState);
 };
 
+Page.prototype.createTree = function() {
+    return this.render(this.state);
+};
+
 Page.prototype.forceUpdate = function() {
-    this._nextTree(this.render(this.state));
+    this._nextTree(this.createTree());
 };
 
 Page.prototype._nextTree = function(nextTree) {
@@ -49,6 +54,8 @@ Page.prototype._sendPatches = function(patches) {
 };
 
 Page.prototype.initialHtml = function() {
+    this._tree = this.createTree();
+    return vdomToHtml(this._tree);
 }
 
 module.exports = Page;

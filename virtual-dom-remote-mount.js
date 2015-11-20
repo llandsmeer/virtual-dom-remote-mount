@@ -87,14 +87,16 @@ function pageToHtml(page) {
         '<!doctype html>' +
         '<html>' +
             '<head>' +
-                '<script src="/socket.io/socket.io.js"></script>' +
+                '<script src="/socket.io/socket.io.js"' +
+                        'type="text/javascript"></script>' +
                 (page.head || []).join('') +
             '</head>' +
             '<body>' +
-                '<script src="virtual-dom-remote-mount.js"></script>' +
+                '<script src="virtual-dom-remote-mount.js"' +
+                        'type="text/javascript"></script>' +
                 '<div id="virtual-dom-remote-mount-target">' +
                     page.initialHtml() +
-                '/<div>' +
+                '</div>' +
             '</body>' +
         '</html>'
     );
