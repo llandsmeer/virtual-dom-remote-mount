@@ -8,7 +8,6 @@ Might not actually be a good idea.
 ```javascript
 var h = require('virtual-dom/h');
 var Page = require('./page.js');
-var mount = require('./virtual-dom-remote-mount.js');
 
 class App extends Page {
 
