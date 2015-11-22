@@ -50,13 +50,15 @@ Page.prototype._nextTree = function(nextTree) {
 
 Page.prototype._sendTree = function(tree) {
     if (this.ioSocket) {
-        this.ioSocket.emit('virtual-dom-remote-mount:tree', ioClone(tree));
+        this.ioSocket.emit('virtual-dom-remote-mount:tree',
+            semiclone(tree));
     }
 };
 
 Page.prototype._sendPatches = function(patches) {
     if (this.ioSocket) {
-        this.ioSocket.emit('virtual-dom-remote-mount:patches', patches);
+        this.ioSocket.emit('virtual-dom-remote-mount:patches',
+            semiclone(patches));
     }
 };
 
@@ -65,6 +67,7 @@ Page.prototype.mountSocketIo = function(socket) {
         throw 'socket already mounted';
     }
     this.ioSocket = socket;
+    socket.on('error', console.error.bind(console));
 };
 
 Page.prototype.initialHtml = function() {
@@ -74,11 +77,39 @@ Page.prototype.initialHtml = function() {
 
 module.exports = Page;
 
-function copy(dst, src) {
+function copy(dst, src, preprocess) {
     var key;
     for (key in src) {
-        if (dst.hasOwnProperty(key)) {
-            dst[key] = src[key];
+        if (src.hasOwnProperty(key)) {
+            if (preprocess) {
+                dst[key] = preprocess(src[key]);
+            } else {
+                dst[key] = src[key];
+            }
         }
     }
 };
+
+function clone(src, preprocess) {
+    var dst = {};
+    copy(dst, src, preprocess);
+    return dst;
+}
+
+function semiclone(obj) {
+    var objclone;
+    if (obj == null) {
+        return obj;
+    }
+    if (Array.isArray(obj)) {
+        return obj;
+    }
+    if (typeof obj == 'object') {
+        objclone = clone(obj, semiclone);
+        if (obj.__proto__ != null) {
+            objclone.proto = clone(obj.__proto__);
+        }
+        return objclone;
+    }
+    return obj;
+}

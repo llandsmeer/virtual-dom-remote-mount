@@ -16,10 +16,28 @@ function main() {
 
     socket.on('virtual-dom-remote-mount:patches', function (patches) {
         if (root != null) {
-            root = patch(root, patches);
+            root = patch(root, declone(patches));
         }
     });
 
+}
+
+function declone(obj) {
+    var copy, key;
+    if (obj == null || typeof obj !== 'object' || Array.isArray(obj)) {
+        return obj;
+    }
+    if (obj.hasOwnProperty('proto')) {
+        copy = Object.create(obj.proto);
+    } else {
+        copy = {};
+    }
+    for (key in obj) {
+        if (key !== 'proto' && obj.hasOwnProperty(key)) {
+            copy[key] = declone(obj[key]);
+        }
+    }
+    return copy;
 }
 
 document.addEventListener('DOMContentLoaded', main);
