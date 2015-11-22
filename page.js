@@ -37,6 +37,9 @@ Page.prototype.forceUpdate = function() {
 };
 
 Page.prototype._nextTree = function(nextTree) {
+    if (!this.ioSocket) {
+        return;
+    }
     if (this._tree === undefined) {
         this._sendTree(nextTree);
     } else {
@@ -46,11 +49,22 @@ Page.prototype._nextTree = function(nextTree) {
 };
 
 Page.prototype._sendTree = function(tree) {
-    this.ioSocket.emit('virtual-dom-remote-mount:tree', ioClone(tree));
+    if (this.ioSocket) {
+        this.ioSocket.emit('virtual-dom-remote-mount:tree', ioClone(tree));
+    }
 };
 
 Page.prototype._sendPatches = function(patches) {
-    this.ioSocket.emit('virtual-dom-remote-mount:patches', patches);
+    if (this.ioSocket) {
+        this.ioSocket.emit('virtual-dom-remote-mount:patches', patches);
+    }
+};
+
+Page.prototype.mountSocketIo = function(socket) {
+    if (this.ioSocket) {
+        throw 'socket already mounted';
+    }
+    this.ioSocket = socket;
 };
 
 Page.prototype.initialHtml = function() {

@@ -28,8 +28,8 @@ Mount.prototype.listen = function(port, cb) {
 }
 
 Mount.prototype.registerExpress = function() {
-    this.app.get('/virtual-dom-server.js', this.sendJavascript.bind(this));
-    this.app.use('/', this.handleHttpConnection.bind(this));
+    this.app.get('/virtual-dom-remote-mount.js', this.sendJavascript.bind(this));
+    this.app.use('/static', this.handleHttpConnection.bind(this));
 };
 
 Mount.prototype.handleHttpConnection = function(req, res) {
@@ -37,14 +37,21 @@ Mount.prototype.handleHttpConnection = function(req, res) {
     res.set('Content-Type', 'text/html');
     connid = this.generateConnectionId();
     page = new this.Page();
-    res.send(pageToHtml(page));
+    res.send(pageToHtml(connid, page));
+    this.register.set(connid, page);
 };
 
 Mount.prototype.handleSocketConnection = function(socket) {
+    socket.on('virtual-dom-remote-mount:connect', (function (connid) {
+        var page = this.register.get(connid);
+        if (page) {
+            page.mountSocketIo(socket);
+        }
+    }).bind(this));
 };
 
 
-Mount.prototype.sendJavascript = function(res) {
+Mount.prototype.sendJavascript = function(req, res) {
     res.set('Content-Type', 'text/javascript');
     if (this._script === undefined || RECOMPILE_ALWAYS) {
         compileJavascript(SCRIPT_NAME, function (script) {
@@ -82,7 +89,7 @@ function streamToString (stream, cb) {
     });
 }
 
-function pageToHtml(page) {
+function pageToHtml(connid, page) {
     return (
         '<!doctype html>' +
         '<html>' +
@@ -90,6 +97,9 @@ function pageToHtml(page) {
                 '<script src="/socket.io/socket.io.js"' +
                        ' type="text/javascript"></script>' +
                 (page.head || []).join('') +
+                '<script type="text/javascript">' +
+                    'var _VIRTUALDOMREMOTEMOUNTID = ' + connid + ';' +
+                '</script>' +
             '</head>' +
             '<body>' +
                 '<script src="virtual-dom-remote-mount.js"' +
