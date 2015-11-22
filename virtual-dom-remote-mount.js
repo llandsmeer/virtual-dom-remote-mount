@@ -1,3 +1,7 @@
+/*jslint node: true*/
+
+'use strict';
+
 var path = require('path');
 var express = require('express');
 var socketio = require('socket.io');
@@ -16,7 +20,7 @@ function Mount(Page, registerExpressCustom) {
     }
 }
 
-Mount.prototype.listen = function(port, cb) {
+Mount.prototype.listen = function (port, cb) {
     var server;
     this.registerExpress();
     server = this.app.listen(port || 3000, cb || function () {
@@ -25,14 +29,14 @@ Mount.prototype.listen = function(port, cb) {
     });
     this.io = socketio.listen(server);
     this.io.on('connection', this.handleSocketConnection.bind(this));
-}
+};
 
-Mount.prototype.registerExpress = function() {
+Mount.prototype.registerExpress = function () {
     this.app.get('/virtual-dom-remote-mount.js', this.sendJavascript.bind(this));
     this.app.use('/', this.handleHttpConnection.bind(this));
 };
 
-Mount.prototype.handleHttpConnection = function(req, res) {
+Mount.prototype.handleHttpConnection = function (req, res) {
     var connid, page;
     res.set('Content-Type', 'text/html');
     connid = this.generateConnectionId();
@@ -41,7 +45,7 @@ Mount.prototype.handleHttpConnection = function(req, res) {
     this.register.set(connid, page);
 };
 
-Mount.prototype.handleSocketConnection = function(socket) {
+Mount.prototype.handleSocketConnection = function (socket) {
     socket.on('virtual-dom-remote-mount:connect', (function (connid) {
         var page = this.register.get(connid);
         if (page) {
@@ -51,15 +55,15 @@ Mount.prototype.handleSocketConnection = function(socket) {
 };
 
 
-Mount.prototype.sendJavascript = function(req, res) {
+Mount.prototype.sendJavascript = function (req, res) {
     res.set('Content-Type', 'text/javascript');
-    if (this._script === undefined || RECOMPILE_ALWAYS) {
+    if (this.cachedScript === undefined || RECOMPILE_ALWAYS) {
         compileJavascript(SCRIPT_NAME, function (script) {
-            this._script = script;
+            this.cachedScript = script;
             res.send(script);
         }, this);
     } else {
-        res.send(this._script);
+        res.send(this.cachedScript);
     }
 };
 
@@ -71,7 +75,7 @@ module.exports = function (port, PageClass, cb) {
     var mount;
     mount = new Mount(PageClass);
     mount.listen(port, cb);
-}
+};
 
 function compileJavascript(filename, cb, bindTo) {
     var bundle;
@@ -98,7 +102,7 @@ function pageToHtml(connid, page) {
                        ' type="text/javascript"></script>' +
                 (page.head || []).join('') +
                 '<script type="text/javascript">' +
-                    'var _VIRTUALDOMREMOTEMOUNTID = ' + connid + ';' +
+                    'var VIRTUALDOMREMOTEMOUNTID = ' + connid + ';' +
                 '</script>' +
             '</head>' +
             '<body>' +
