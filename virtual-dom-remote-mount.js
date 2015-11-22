@@ -3,6 +3,7 @@
 'use strict';
 
 var path = require('path');
+var uuid = require('uuid');
 var express = require('express');
 var socketio = require('socket.io');
 var browserify = require('browserify');
@@ -11,7 +12,6 @@ var SCRIPT_NAME = 'client.js';
 var RECOMPILE_ALWAYS = true;
 
 function Mount(Page, registerExpressCustom) {
-    this._id = 0;
     this.register = new Map();
     this.Page = Page;
     this.app = express();
@@ -68,7 +68,7 @@ Mount.prototype.sendJavascript = function (req, res) {
 };
 
 Mount.prototype.generateConnectionId = function () {
-    return this._id++;
+    return uuid.v4();
 };
 
 module.exports = function (port, PageClass, cb) {
