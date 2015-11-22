@@ -72,10 +72,11 @@ Mount.prototype.generateConnectionId = function () {
 };
 
 module.exports = function (port, PageClass, cb) {
-    var mount;
-    mount = new Mount(PageClass);
+    var mount = new Mount(PageClass);
     mount.listen(port, cb);
 };
+
+module.exports.Mount = Mount;
 
 function compileJavascript(filename, cb, bindTo) {
     var bundle;
@@ -83,7 +84,7 @@ function compileJavascript(filename, cb, bindTo) {
     streamToString(bundle, cb.bind(bindTo));
 }
 
-function streamToString (stream, cb) {
+function streamToString(stream, cb) {
     var result = '';
     stream.on('data', function (buffer) {
         result += buffer.toString();
