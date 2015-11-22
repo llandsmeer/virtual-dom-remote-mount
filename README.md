@@ -1,6 +1,7 @@
 # virtual-dom-remote-mount
 
-Write code using virtual-dom without having to worry about the client side.
+Write code using virtual-dom without having to worry about the client side.  
+Might not actually be a good idea.
 
 ## Example
 
