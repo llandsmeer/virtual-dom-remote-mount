@@ -97,12 +97,16 @@ function clone(src, preprocess) {
 }
 
 function semiclone(obj) {
-    var objclone;
+    var i, objclone;
     if (obj == null) {
         return obj;
     }
     if (Array.isArray(obj)) {
-        return obj;
+        objclone = [];
+        for (i = 0; i < obj.length; i++) {
+            objclone.push(semiclone(obj[i]))
+        }
+        return objclone;
     }
     if (typeof obj == 'object') {
         objclone = clone(obj, semiclone);

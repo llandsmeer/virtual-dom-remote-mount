@@ -24,17 +24,25 @@ function main() {
 
 function declone(obj) {
     var copy, key;
-    if (obj == null || typeof obj !== 'object' || Array.isArray(obj)) {
-        return obj;
+    if (obj == null || typeof obj !== 'object') {
+        copy = obj;
     }
-    if (obj.hasOwnProperty('proto')) {
-        copy = Object.create(obj.proto);
-    } else {
-        copy = {};
+    else if (Array.isArray(obj)) {
+        copy = [];
+        for (key = 0; key < obj.length; key++) {
+            copy.push(declone(obj[key]));
+        }
     }
-    for (key in obj) {
-        if (key !== 'proto' && obj.hasOwnProperty(key)) {
-            copy[key] = declone(obj[key]);
+    else {
+        if (obj.hasOwnProperty('proto')) {
+            copy = Object.create(obj.proto);
+        } else {
+            copy = {};
+        }
+        for (key in obj) {
+            if (key !== 'proto' && obj.hasOwnProperty(key)) {
+                copy[key] = declone(obj[key]);
+            }
         }
     }
     return copy;
