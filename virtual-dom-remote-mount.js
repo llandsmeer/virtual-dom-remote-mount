@@ -103,7 +103,9 @@ function pageToHtml(connid, page) {
                        ' type="text/javascript"></script>' +
                 (page.head || []).join('') +
                 '<script type="text/javascript">' +
-                    'var VIRTUALDOMREMOTEMOUNTID = ' + connid + ';' +
+                    'var VIRTUALDOMREMOTEMOUNTID = ' +
+                        JSON.stringify(connid) +
+                        ';' +
                 '</script>' +
             '</head>' +
             '<body>' +
