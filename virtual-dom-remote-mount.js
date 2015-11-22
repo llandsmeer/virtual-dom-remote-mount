@@ -29,7 +29,7 @@ Mount.prototype.listen = function(port, cb) {
 
 Mount.prototype.registerExpress = function() {
     this.app.get('/virtual-dom-remote-mount.js', this.sendJavascript.bind(this));
-    this.app.use('/static', this.handleHttpConnection.bind(this));
+    this.app.use('/', this.handleHttpConnection.bind(this));
 };
 
 Mount.prototype.handleHttpConnection = function(req, res) {
