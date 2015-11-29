@@ -25,7 +25,7 @@ function clone(src, preprocess) {
 }
 
 function semiclone(obj) {
-    var i, objclone;
+    var i, objclone, proto;
     if (obj === null || obj === undefined) {
         return obj;
     }
@@ -38,8 +38,9 @@ function semiclone(obj) {
     }
     if (typeof obj === 'object') {
         objclone = clone(obj, semiclone);
-        if (obj.__proto__ != null) {
-            objclone.proto = clone(obj.__proto__);
+        proto = Object.getPrototypeOf(obj);
+        if (proto !== undefined && Object.keys(proto).length > 0) {
+            objclone.proto = clone(proto);
         }
         return objclone;
     }

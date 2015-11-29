@@ -1,6 +1,8 @@
 /*jslint browser: true*/
 /*globals io, VIRTUALDOMREMOTEMOUNTID*/
 
+(function() {
+
 'use strict';
 
 var VNode = require('virtual-dom/vnode/vnode');
@@ -47,3 +49,5 @@ function main() {
 }
 
 document.addEventListener('DOMContentLoaded', main);
+
+})();
