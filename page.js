@@ -8,6 +8,7 @@ var Renderable = require('./renderable');
 var helpers = require('./helpers');
 
 function Page() {
+    this.head = [];
     this.state = {};
 }
 
