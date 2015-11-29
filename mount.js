@@ -2,18 +2,17 @@
 
 'use strict';
 
-var path = require('path');
 var uuid = require('uuid');
 var express = require('express');
 var socketio = require('socket.io');
-var browserify = require('browserify');
+var helpers = require('./helpers');
 
 var SCRIPT_NAME = 'client.js';
 var RECOMPILE_ALWAYS = true;
 
-function Mount(Page, registerExpressCustom) {
+function Mount(Renderable, registerExpressCustom) {
     this.register = new Map();
-    this.Page = Page;
+    this.Renderable = Renderable;
     this.app = express();
     if (registerExpressCustom) {
         registerExpressCustom(this.app);
@@ -40,25 +39,31 @@ Mount.prototype.handleHttpConnection = function (req, res) {
     var connid, page;
     res.set('Content-Type', 'text/html');
     connid = this.generateConnectionId();
-    page = new this.Page();
+    page = new this.Renderable();
     res.send(pageToHtml(connid, page));
     this.register.set(connid, page);
 };
 
 Mount.prototype.handleSocketConnection = function (socket) {
-    socket.on('virtual-dom-remote-mount:connect', (function (connid) {
+    var onconnect = function (connid) {
         var page = this.register.get(connid);
-        if (page) {
-            page.mountSocketIo(socket);
+        if (!page) {
+            return;
         }
-    }).bind(this));
+        page.onpatches(function (patches) {
+            socket.emit('virtual-dom-remote-mount:patches',
+                helpers.semiclone(patches));
+        });
+    };
+    socket.on('virtual-dom-remote-mount:connect', onconnect.bind(this));
+    socket.on('error', console.error.bind(console));
 };
 
 
 Mount.prototype.sendJavascript = function (req, res) {
     res.set('Content-Type', 'text/javascript');
     if (this.cachedScript === undefined || RECOMPILE_ALWAYS) {
-        compileJavascript(SCRIPT_NAME, function (script) {
+        helpers.compileJavascript(SCRIPT_NAME, function (script) {
             this.cachedScript = script;
             res.send(script);
         }, this);
@@ -71,30 +76,15 @@ Mount.prototype.generateConnectionId = function () {
     return uuid.v4();
 };
 
-module.exports = function (port, PageClass, cb) {
-    var mount = new Mount(PageClass);
+module.exports = function (port, Renderable, cb) {
+    var mount = new Mount(Renderable);
     mount.listen(port, cb);
 };
 
 module.exports.Mount = Mount;
 
-function compileJavascript(filename, cb, bindTo) {
-    var bundle;
-    bundle = browserify(path.join(__dirname, filename)).bundle();
-    streamToString(bundle, cb.bind(bindTo));
-}
-
-function streamToString(stream, cb) {
-    var result = '';
-    stream.on('data', function (buffer) {
-        result += buffer.toString();
-    });
-    stream.on('end', function () {
-        cb(result);
-    });
-}
-
 function pageToHtml(connid, page) {
+    var innerHtml = page.renderHtml();
     return (
         '<!doctype html>' +
         '<html>' +
@@ -112,7 +102,7 @@ function pageToHtml(connid, page) {
                 '<script src="virtual-dom-remote-mount.js"' +
                        ' type="text/javascript"></script>' +
                 '<div id="virtual-dom-remote-mount-target">' +
-                    page.initialHtml() +
+                    innerHtml +
                 '</div>' +
             '</body>' +
         '</html>'
