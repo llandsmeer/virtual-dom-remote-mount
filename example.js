@@ -1,11 +1,3 @@
-# virtual-dom-remote-mount
-
-Write code using virtual-dom without having to worry about the client side.  
-Might not actually be a good idea.
-
-## Example
-
-```javascript
 'use strict';
 
 var h = require('virtual-dom/h');
@@ -33,4 +25,3 @@ class App extends Page {
 }
 
 mount(3000, App);
-```
