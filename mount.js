@@ -76,12 +76,7 @@ Mount.prototype.generateConnectionId = function () {
     return uuid.v4();
 };
 
-module.exports = function (port, Renderable, cb) {
-    var mount = new Mount(Renderable);
-    mount.listen(port, cb);
-};
-
-module.exports.Mount = Mount;
+module.exports = Mount;
 
 function pageToHtml(connid, page) {
     var innerHtml = page.renderHtml();

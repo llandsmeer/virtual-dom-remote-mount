@@ -1,10 +1,9 @@
 'use strict';
 
 var h = require('virtual-dom/h');
-var Page = require('./page.js');
-var mount = require('./mount');
+var mount = require('./index');
 
-class App extends Page {
+class App extends mount.Page {
 
     constructor() {
         super();
