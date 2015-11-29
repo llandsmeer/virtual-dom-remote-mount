@@ -1,4 +1,8 @@
-var Renderable = require('./renderable')
+/*jslint node: true*/
+
+'use strict';
+
+var Renderable = require('./renderable');
 var Page = require('./page');
 var Mount = require('./mount');
 
