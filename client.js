@@ -15,7 +15,7 @@ function declone(obj) {
     } else if (Array.isArray(obj)) {
         copy = [];
         for (i = 0; i < obj.length; i += 1) {
-            copy.push(declone(obj[key]));
+            copy.push(declone(obj[i]));
         }
     } else {
         if (obj.hasOwnProperty('proto')) {
@@ -39,6 +39,7 @@ function main() {
     root = target.firstChild;
     socket.emit('virtual-dom-remote-mount:connect', VIRTUALDOMREMOTEMOUNTID);
     socket.on('virtual-dom-remote-mount:patches', function (patches) {
+        console.log(declone(patches));
         if (root !== null) {
             root = patch(root, declone(patches));
         }
