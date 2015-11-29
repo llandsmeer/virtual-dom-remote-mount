@@ -6,6 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+      "type": "git",
+      "url": "git://github.com/llandsmeer/virtual-dom-remote-mount.git"
+  },
+  "keywords": [
+      "virtual-dom"
+  ],
   "author": "Lennart Landsmeer <lennart@landsmeer.email>",
   "license": "MIT",
   "dependencies": {
@@ -15,5 +22,8 @@
     "uuid": "^2.0.1",
     "vdom-to-html": "^2.2.0",
     "virtual-dom": "^2.1.1"
+  },
+  "bugs": {
+      "url": "https://github.com/llandsmeer/virtual-dom-remote-mount/issues"
   }
 }
