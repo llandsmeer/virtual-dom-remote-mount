@@ -2,6 +2,7 @@
 
 'use strict';
 
+
 var path = require('path');
 var browserify = require('browserify');
 
@@ -19,32 +20,44 @@ function copy(dst, src, preprocess) {
 }
 
 function clone(src, preprocess) {
-    var dst = {};
-    copy(dst, src, preprocess);
+    var dst, i;
+    if (src === null || src === undefined) {
+        dst = src;
+    } else if (Array.isArray(src)) {
+        dst = [];
+        for (i = 0; i < src.length; i++) {
+            if (preprocess) {
+                dst.push(preprocess(src[i]));
+            } else {
+                dst.push(src[i]);
+            }
+        }
+    } else if (typeof src === 'object') {
+        dst= {};
+        copy(dst, src, preprocess);
+    } else {
+        dst = src;
+    }
     return dst;
 }
 
+function isSimpleObject(obj) {
+    return obj !== null &&
+           obj !== undefined &&
+           !Array.isArray(obj) &&
+           typeof obj === 'object';
+}
+
 function semiclone(obj) {
-    var i, objclone, proto;
-    if (obj === null || obj === undefined) {
-        return obj;
-    }
-    if (Array.isArray(obj)) {
-        objclone = [];
-        for (i = 0; i < obj.length; i += 1) {
-            objclone.push(semiclone(obj[i]));
-        }
-        return objclone;
-    }
-    if (typeof obj === 'object') {
-        objclone = clone(obj, semiclone);
+    var objclone, proto;
+    objclone = clone(obj, semiclone);
+    if (isSimpleObject(obj)) {
         proto = Object.getPrototypeOf(obj);
         if (proto !== undefined && Object.keys(proto).length > 0) {
             objclone.proto = clone(proto);
         }
-        return objclone;
     }
-    return obj;
+    return objclone;
 }
 
 function streamToString(stream, cb) {
