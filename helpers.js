@@ -81,3 +81,4 @@ module.exports.clone = clone;
 module.exports.semiclone = semiclone;
 module.exports.compileJavascript = compileJavascript;
 module.exports.streamToString = streamToString;
+module.exports.vdom = require('./virtual-dom-helpers.js');
