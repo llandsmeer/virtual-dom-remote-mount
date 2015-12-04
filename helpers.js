@@ -76,9 +76,33 @@ function compileJavascript(filename, cb, bindTo) {
     streamToString(bundle, cb.bind(bindTo));
 }
 
+function difference(newContainer, oldContainer) {
+    var created = [];
+    var deleted = [];
+    if (newContainer) {
+        newContainer.forEach(function (_, newKey) {
+            if (oldContainer === undefined || !oldContainer.has(newKey)) {
+                created.push(newKey);
+            }
+        });
+    }
+    if (oldContainer) {
+        oldContainer.forEach(function (_, oldKey) {
+            if (newContainer === undefined || !newContainer.has(oldKey)) {
+                deleted.push(oldKey);
+            }
+        });
+    }
+    return {
+        created: created,
+        deleted: deleted
+    };
+}
+
 module.exports.copy = copy;
 module.exports.clone = clone;
 module.exports.semiclone = semiclone;
 module.exports.compileJavascript = compileJavascript;
 module.exports.streamToString = streamToString;
+module.exports.difference = difference;
 module.exports.vdom = require('./virtual-dom-helpers.js');

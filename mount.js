@@ -50,9 +50,9 @@ Mount.prototype.handleSocketConnection = function (socket) {
         if (!page) {
             return;
         }
-        page.onpatches(function (patches) {
-            socket.emit('virtual-dom-remote-mount:patches',
-                helpers.semiclone(patches));
+        page.onupdate(function (update) {
+            socket.emit('virtual-dom-remote-mount:update',
+                helpers.semiclone(update));
         });
         socket.on('virtual-dom-remote-mount:event', function (eventPath, args) {
             page.handleEvent(eventPath, args);
@@ -61,7 +61,6 @@ Mount.prototype.handleSocketConnection = function (socket) {
     socket.on('virtual-dom-remote-mount:connect', onconnect.bind(this));
     socket.on('error', console.error.bind(console));
 };
-
 
 Mount.prototype.sendJavascript = function (req, res) {
     res.set('Content-Type', 'text/javascript');

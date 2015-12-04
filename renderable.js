@@ -21,9 +21,9 @@ Renderable.prototype.render = function () {
 
 /* public */
 
-Renderable.prototype.onpatches = function (cb, thisInstance) {
-    this._renderable_eventemitter().on('patches', function (patches) {
-        cb.call(thisInstance, patches);
+Renderable.prototype.onupdate = function (cb, thisInstance) {
+    this._renderable_eventemitter().on('update', function (update) {
+        cb.call(thisInstance, update);
     });
 };
 
@@ -59,7 +59,18 @@ Renderable.prototype._renderable_sendNextTree = function (nextTree) {
 };
 
 Renderable.prototype._renderable_sendPatches = function (patches) {
-    this._renderable_eventemitter().emit('patches', patches);
+    var eventSubscribeQueue, eventUnsubscribeQueue;
+    eventSubscribeQueue = this._renderable_eventSubscribeQueue();
+    eventUnsubscribeQueue = this._renderable_eventUnsubscribeQueue();
+    this._renderable_eventemitter().emit('update', {
+        patches: patches,
+        events: {
+            subscribe: eventSubscribeQueue,
+            unsubscribe: eventUnsubscribeQueue
+        }
+    });
+    eventSubscribeQueue.length = 0;
+    eventUnsubscribeQueue.length = 0;
 };
 
 Renderable.prototype._renderable_eventemitter = function () {
@@ -72,7 +83,8 @@ Renderable.prototype._renderable_eventemitter = function () {
 /* events */
 
 Renderable.prototype._renderable_updateEvents = function (tree) {
-    var handlers, prevHandlers, allEventNames, prevAllEventNames;
+    var handlers, prevHandlers, allEventNames, prevAllEventNames, allEventDiff,
+        eventSubscribeQueue, eventUnsubscribeQueue;
     handlers = new Map();
     allEventNames = new Set();
     helpers.vdom.popEvents(tree, function (path, eventName, handler) {
@@ -83,7 +95,31 @@ Renderable.prototype._renderable_updateEvents = function (tree) {
     });
     this._renderable_handlers = handlers;
     prevAllEventNames = this._renderable_allEventNames;
+    allEventDiff = helpers.difference(allEventNames, prevAllEventNames);
+    eventSubscribeQueue = this._renderable_eventSubscribeQueue();
+    eventUnsubscribeQueue = this._renderable_eventUnsubscribeQueue();
+    allEventDiff.created.forEach(function (createdEvent) {
+        eventSubscribeQueue.push(createdEvent);
+    });
+    allEventDiff.deleted.forEach(function (deletedEvent) {
+        eventUnsubscribeQueue.push(deletedEvent);
+    });
     this._renderable_allEventNames = allEventNames;
+    console.log(this._renderable_handlers);
+};
+
+Renderable.prototype._renderable_eventSubscribeQueue = function () {
+    if (this._renderable_eventSubscribeQueueInstance === undefined) {
+        this._renderable_eventSubscribeQueueInstance = [];
+    }
+    return this._renderable_eventSubscribeQueueInstance;
+};
+
+Renderable.prototype._renderable_eventUnsubscribeQueue = function () {
+    if (this._renderable_eventUnsubscribeQueueInstance === undefined) {
+        this._renderable_eventUnsubscribeQueueInstance = [];
+    }
+    return this._renderable_eventUnsubscribeQueueInstance;
 };
 
 Renderable.prototype.handleEvent = function (eventPath, args) {
