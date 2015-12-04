@@ -5,6 +5,7 @@
 var EventEmitter = require('events');
 var diff = require('virtual-dom/diff');
 var vdomToHtml = require('vdom-to-html');
+var helpers = require('./helpers.js');
 
 function Renderable() {
     return;
@@ -27,7 +28,10 @@ Renderable.prototype.onpatches = function (cb, thisInstance) {
 };
 
 Renderable.prototype.renderTree = function () {
-    return this.render();
+    var tree;
+    tree = this.render();
+    this._renderable_updateEvents(tree);
+    return tree;
 };
 
 Renderable.prototype.renderHtml = function () {
@@ -63,6 +67,35 @@ Renderable.prototype._renderable_eventemitter = function () {
         this._renderable_eventemitter_instance = new EventEmitter();
     }
     return this._renderable_eventemitter_instance;
+};
+
+/* events */
+
+Renderable.prototype._renderable_updateEvents = function (tree) {
+    var handlers, prevHandlers, allEventNames, prevAllEventNames;
+    handlers = new Map();
+    allEventNames = new Set();
+    helpers.vdom.popEvents(tree, function (path, eventName, handler) {
+        var eventPath;
+        eventPath = path.join('.') + ':' + eventName;
+        handlers[eventPath] = handler;
+        allEventNames.add(eventName);
+    });
+    this._renderable_handlers = handlers;
+    prevAllEventNames = this._renderable_allEventNames;
+    this._renderable_allEventNames = allEventNames;
+};
+
+Renderable.prototype.handleEvent = function (eventPath, args) {
+    var handler;
+    if (!this._renderable_handlers) {
+        return;
+    }
+    handler = this._renderable_handlers.get(eventPath);
+    if (!handler) {
+        return;
+    }
+    handler.call(this, args);
 };
 
 /* exports */

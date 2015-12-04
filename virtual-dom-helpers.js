@@ -56,13 +56,14 @@ function parseEventName(name) {
 
 function popEventProps(root, cb) {
     eachVNode(root, function(vnode, path) {
-        var key, eventName;
+        var key, handler, eventName;
         for (key in vnode.properties) {
             if (vnode.properties.hasOwnProperty(key)) {
                 eventName = parseEventName(key);
                 if (eventName !== null) {
+                    handler = vnode.properties[key];
                     vnode.properties[key] = undefined;
-                    cb(eventName, path);
+                    cb(path, eventName, handler);
                 }
             }
         }

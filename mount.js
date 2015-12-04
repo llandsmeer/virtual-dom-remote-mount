@@ -54,6 +54,9 @@ Mount.prototype.handleSocketConnection = function (socket) {
             socket.emit('virtual-dom-remote-mount:patches',
                 helpers.semiclone(patches));
         });
+        socket.on('virtual-dom-remote-mount:event', function (eventPath, args) {
+            page.handleEvent(eventPath, args);
+        });
     };
     socket.on('virtual-dom-remote-mount:connect', onconnect.bind(this));
     socket.on('error', console.error.bind(console));
