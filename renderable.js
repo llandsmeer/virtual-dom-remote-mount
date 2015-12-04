@@ -90,7 +90,7 @@ Renderable.prototype._renderable_updateEvents = function (tree) {
     helpers.vdom.popEvents(tree, function (path, eventName, handler) {
         var eventPath;
         eventPath = path.join('.') + ':' + eventName;
-        handlers[eventPath] = handler;
+        handlers.set(eventPath, handler);
         allEventNames.add(eventName);
     });
     this._renderable_handlers = handlers;
@@ -105,7 +105,6 @@ Renderable.prototype._renderable_updateEvents = function (tree) {
         eventUnsubscribeQueue.push(deletedEvent);
     });
     this._renderable_allEventNames = allEventNames;
-    console.log(this._renderable_handlers);
 };
 
 Renderable.prototype._renderable_eventSubscribeQueue = function () {
@@ -127,6 +126,7 @@ Renderable.prototype.handleEvent = function (eventPath, args) {
     if (!this._renderable_handlers) {
         return;
     }
+    console.log(this._renderable_handlers.keys());
     handler = this._renderable_handlers.get(eventPath);
     if (!handler) {
         return;
