@@ -75,7 +75,9 @@ function main() {
             eventName = removeEvents[i];
             root.removeEventListener(eventName, handleEvent);
         }
-        root = patch(root, declone(update.patches));
+        if (update.patches) {
+            root = patch(root, declone(update.patches));
+        }
     });
 }
 

@@ -43,6 +43,10 @@ Renderable.prototype.update = function () {
     this._renderable_sendNextTree(this.renderTree());
 };
 
+Renderable.prototype.connected = function () {
+    this._renderable_sendPatches(false);
+};
+
 /* private */
 
 Renderable.prototype._renderable_initialTree = function () {
@@ -126,7 +130,6 @@ Renderable.prototype.handleEvent = function (eventPath, args) {
     if (!this._renderable_handlers) {
         return;
     }
-    console.log(this._renderable_handlers.keys());
     handler = this._renderable_handlers.get(eventPath);
     if (!handler) {
         return;

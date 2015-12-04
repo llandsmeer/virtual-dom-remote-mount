@@ -57,6 +57,7 @@ Mount.prototype.handleSocketConnection = function (socket) {
         socket.on('virtual-dom-remote-mount:event', function (eventPath, args) {
             page.handleEvent(eventPath, args);
         });
+        page.connected();
     };
     socket.on('virtual-dom-remote-mount:connect', onconnect.bind(this));
     socket.on('error', console.error.bind(console));
