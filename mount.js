@@ -1,4 +1,5 @@
 /*jslint node: true*/
+/*globals Map*/
 
 'use strict';
 
